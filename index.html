@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elliott</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --fg: #f0ece3;
+      --muted: #888;
+      --border: rgba(255,255,255,0.15);
+      --card-bg: #1a1a1a;
+      --tag-bg: #2a2a2a;
+      --font: 'Roboto Mono', monospace;
+    }
+
+    html { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 13px; font-weight: 300; line-height: 1.6; }
+    body { min-height: 100vh; }
+    a { color: var(--fg); text-decoration: underline; cursor: pointer; transition: opacity 0.2s ease; }
+    a:hover { opacity: 0.5; }
+
+    /* ── CONTAINER ── */
+    /* All content sits inside .wrap which is max 900px, centered, with side padding */
+    .wrap {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    /* ── NAV ── */
+    .nav-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg);
+    }
+    .nav-inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px 0;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding-left: 48px;
+      padding-right: 48px;
+    }
+    .nav-logo { display: flex; align-items: center; line-height: 0; transition: opacity 0.2s ease; }
+    .nav-logo:hover { opacity: 0.5; }
+    .nav-logo svg { display: block; }
+    /* Full-width rule — no wrap */
+    .nav-rule { border: none; border-top: 1px solid var(--border); width: 100%; }
+
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: block; }
+    .page.page-enter { animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .page.page-exit  { animation: pageExit 0.2s ease forwards; }
+
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pageExit {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+
+    /* ── HERO ── */
+    .hero { padding: 160px 0; }
+    .hero h1 { font-size: 48px; font-weight: 300; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .hero .sub { font-size: 11px; color: var(--muted); margin-bottom: 28px; }
+    .hero p { font-size: 13px; line-height: 1.75; margin-bottom: 8px; }
+    .hero .tagline { font-weight: 500; margin-top: 6px; }
+
+    /* ── FULL-WIDTH RULE ── */
+    .rule { border: none; border-top: 1px solid var(--border); width: 100%; }
+
+    /* ── SECTIONS ── */
+    .section { padding: 80px 0; }
+    .section h2 { font-size: 22px; font-weight: 300; margin-bottom: 32px; }
+
+    /* ── EXPERIENCE CARDS ── */
+    .cards { display: flex; flex-direction: column; gap: 16px; }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 24px 28px;
+      background: var(--bg);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 4px;
+    }
+    .card-title { font-size: 13px; font-weight: 500; }
+    .card-tag {
+      font-size: 11px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 2px 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .card-company { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+    .card p { font-size: 12px; line-height: 1.75; margin-bottom: 16px; }
+    .card a { font-size: 12px; }
+    .card-tag-mobile { display: none; }
+
+    /* ── ROLE SPEC CARD ── */
+    .role-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 28px 32px;
+      background: var(--card-bg);
+    }
+    .role-card h3 { font-size: 12px; font-weight: 500; margin-bottom: 14px; }
+    .role-card p { font-size: 12px; line-height: 1.75; margin-bottom: 10px; }
+    .role-card p:last-child { margin-bottom: 0; }
+
+    /* ── CONTRIBUTIONS ── */
+    .contrib-item { margin-bottom: 36px; }
+    .contrib-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 0;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s ease;
+    }
+    .contrib-title:hover { opacity: 0.6; }
+    .contrib-title .icon { font-size: 16px; font-weight: 300; line-height: 1; display: inline-block; }
+    .contrib-body {
+      font-size: 12px;
+      line-height: 1.75;
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s ease, margin-top 0.35s ease;
+      margin-top: 0;
+      overflow: hidden;
+    }
+    .contrib-body-inner { overflow: hidden; }
+    .contrib-body.open {
+      grid-template-rows: 1fr;
+      margin-top: 14px;
+    }
+    .contrib-body p { margin-bottom: 14px; }
+    .contrib-body p:last-child { margin-bottom: 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 48px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .wrap { padding: 0 20px; }
+      .nav-inner { padding-left: 20px; padding-right: 20px; }
+      .hero { padding: 96px 0; }
+      .hero h1 { font-size: 32px; }
+      .section { padding: 48px 0; }
+      .card-header { margin-bottom: 4px; }
+      .card-tag { display: none; }
+      .card-tag-mobile {
+        display: inline-block;
+        font-size: 11px;
+        background: var(--tag-bg);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 2px 10px;
+        margin-bottom: 14px;
+      }
+      .card-company { margin-bottom: 6px; }
+      footer { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <div class="nav-sticky">
+    <div class="nav-inner">
+      <a class="nav-logo" onclick="navigate('home')" title="Home">
+        <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.0312 24H0V20H22L20.0312 24ZM15.0518 13.9424H0V9.94238H17.0205L15.0518 13.9424ZM20.0312 4H0V0H22L20.0312 4Z" fill="white"/>
+        </svg>
+      </a>
+    </div>
+    <hr class="nav-rule" />
+  </div>
+
+  <!-- PAGE: HOME -->
+  <div class="page active" id="page-home">
+
+    <div class="wrap">
+      <div class="hero">
+        <h1>Elliott</h1>
+        <p class="sub">el - ee - uht</p>
+        <p>A Specialist Product Designer, working in the Loop Design System team at The BT Group. He is passionate about simplicity, pixel perfection, and enabling teams to create consistent user experiences.</p>
+        <p class="tagline">Detached components make him cry.</p>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <h2>Experience</h2>
+        <div class="cards">
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Specialist Product Designer</span>
+              <span class="card-tag">March 26 – Present</span>
+            </div>
+            <p class="card-company">BT Group</p>
+            <span class="card-tag-mobile">March 26 – Present</span>
+            <p>Expanding the Loop Design System from a Design System which handled a single brand (EE) to a multi-brand Design System handling all brands under the BT Group (BT, EE and Plusnet).</p>
+            <a onclick="navigate('bt-group')">Learn more</a>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Design System Lead</span>
+              <span class="card-tag">July 23 – March 26</span>
+            </div>
+            <p class="card-company">Interactive Investor</p>
+            <span class="card-tag-mobile">July 23 – March 26</span>
+            <p>Rebuilding the Design System from scratch to improve speed and scalability, while refining the existing version. Establishing a dedicated Design System squad to ensure Figma and Code parity was maintained.</p>
+            <a onclick="navigate('interactive-investor')">Learn more</a>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Lead UI Designer</span>
+              <span class="card-tag">October 20 – July 23</span>
+            </div>
+            <p class="card-company">Boohoo Group</p>
+            <span class="card-tag-mobile">October 20 – July 23</span>
+            <p>Designing experiences for 13 Boohoo Group brands, including Debenhams, Karen Millen and Burton, building a whitelabel Design System, and working on major initiatives such as the addition of Ratings &amp; Reviews.</p>
+            <a onclick="navigate('boohoo-group')">Learn more</a>
+          </div>
+
+        </div>
+        <p style="font-size:12px; margin-top:24px;">Full list of experiences available on <a href="https://uk.linkedin.com/in/ellliottt" target="_blank">LinkedIn</a></p>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <h2>Let's connect</h2>
+        <p>Passionate about Design Systems? Interesting in working together? Just want to say hi? Find me on <a href="https://uk.linkedin.com/in/ellliottt" target="_blank">LinkedIn</a> and let's connect.</p>
+      </div>
+    </div>
+
+    <footer>Every time a designer detaches a component, a flower stops blooming.</footer>
+  </div>
+
+
+  <!-- PAGE: BT GROUP -->
+  <div class="page" id="page-bt-group">
+
+    <div class="wrap">
+      <div class="hero">
+        <h1>Specialist Product Designer</h1>
+        <p class="sub">BT Group</p>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <div class="role-card">
+          <h3>Role spec</h3>
+          <p>As Specialist Product Designer, I'm contributing to the evolution of the Loop Design System, taking it from a Design System which handled a single brand (EE) to a multi-brand Design System handling all BT Group brands (BT, EE &amp; Plusnet), used by over 100 Product Designers.</p>
+          <p>This includes the introduction and implementation of Design Tokens as a way of standardising design decisions across all brands, providing a shared language they all adhere to.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <h2>Notable contributions</h2>
+
+        <div class="contrib-item">
+          <div class="contrib-title" onclick="toggleContrib(this)">
+            Loop Multi-brand Design System <span class="icon">+</span>
+          </div>
+          <div class="contrib-body">
+            <div class="contrib-body-inner">
+              <p>The Loop Design System started as a Design System used by just the EE brand. As part of the restructuring of The BT Group, the Design System evolved from the single brand version to one which handled all brands in The BT Group (BT, EE and Plusnet). This mammoth task involved the introduction of Design Tokens to the Design System, aligning the design decisions across all brands so they used a shared language.</p>
+              <p>The multi-brand Design System made it easy to create experiences for multiple brands, and switch between brands or Light and Dark mode changed from a manual process to being handled automatically through modes. This decreased the time it took for Product Designers to create designs, and increased the accuracy of the final products.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer>Every time a designer detaches a component, a flower stops blooming.</footer>
+  </div>
+
+
+  <!-- PAGE: INTERACTIVE INVESTOR -->
+  <div class="page" id="page-interactive-investor">
+
+    <div class="wrap">
+      <div class="hero">
+        <h1>Design System Lead</h1>
+        <p class="sub">Interactive Investor</p>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <div class="role-card">
+          <h3>Role spec</h3>
+          <p>As Design System Lead, I built a V2 Design System and dedicated squad from scratch, while maintaining and developing the existing Design System, using it as a vehicle to provide data for what V2 should look like.</p>
+          <p>I worked closely with multiple departments to establish the pain points from the existing Design, the gaps in the workflow from Design to Dev, and streamlined to contribution model to bring focus on parity between Figma and Code.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <h2>Notable contributions</h2>
+
+        <div class="contrib-item">
+          <div class="contrib-title" onclick="toggleContrib(this)">
+            Creation of PortfolioDS <span class="icon">+</span>
+          </div>
+          <div class="contrib-body">
+            <div class="contrib-body-inner">
+              <p>When I started the role, the existing Design System was more of a Component Library, with little documentation, and overly complex Components due to the Figma Design System being contributed to by the whole team. There was also a distinct lack of parity between Figma and Code, as Designers had the freedom to create what they wanted, and squads didn't focus on maintaining Storybook.</p>
+              <p>Using the lack of parity, difficulty maintaining a poorly built Component Library, and data from timed tests between the existing Design System and a test version, I successfully built a business case for a dedicating the majority of my time to building a new Design System in Figma from scratch, setting up a dedicated squad to build it with Figma and Code parity at the heart, and establishing a company-wide focus on creating consistent experiences as a result.</p>
+              <p>Component variants were simplified vastly, from overly complex assets which were created before Figma introduced certain features, to streamlined Components which still offered all the customisation that the V1 versions had. This resulted in a fraction of the physical variants being needed, through efficient usage of variables, booleans, slots and other properties.</p>
+              <p>This role spanned multiple departments, including Brand, Engineering, Content, UX Design and UX Research.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contrib-item">
+          <div class="contrib-title" onclick="toggleContrib(this)">
+            UX Team Workshops &amp; Education <span class="icon">+</span>
+          </div>
+          <div class="contrib-body">
+            <div class="contrib-body-inner">
+              <p>A major part of my role, as the team's UI authority, was providing regular up-skilling sessions with the UX Team, as well as providing regular updates on the progress of the new Design System, rationale behind decisions being made, and gathering feedback from Designers on what could be improved. The up-skilling sessions enabled the users of the Design System to fully understand how to use Figma effectively, increasing their familiarity with features like auto-layout, booleans, variables and prototyping.</p>
+              <p>I was the first adopter of Figma Make at the company, and after exploring it's capabilities, ran multiple sessions with the UX Team to help them get to the stage where it became the primary way that prototypes were created, reducing the amount of time it took to create them and making them more interactive as a result.</p>
+              <p>The numerous presentations I gave to not just the UX Team but also executives and other stakeholders kept them informed during the creation period of the new Design System, and allowed me to keep everyone aware of upcoming changes well in advance, as well as the rationale behind any changes.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer>Every time a designer detaches a component, a flower stops blooming.</footer>
+  </div>
+
+
+  <!-- PAGE: BOOHOO GROUP -->
+  <div class="page" id="page-boohoo-group">
+
+    <div class="wrap">
+      <div class="hero">
+        <h1>Lead UI Designer</h1>
+        <p class="sub">Boohoo Group</p>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <div class="role-card">
+          <h3>Role spec</h3>
+          <p>Leading the creation of the Design System used across 13 group brands, managing a team of 4 UX/UI Designers, and providing designs for important initiatives such as Ratings &amp; Reviews and Size Guide.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="wrap">
+      <div class="section">
+        <h2>Notable contributions</h2>
+
+        <div class="contrib-item">
+          <div class="contrib-title" onclick="toggleContrib(this)">
+            Design System &amp; Style Guide <span class="icon">+</span>
+          </div>
+          <div class="contrib-body">
+            <div class="contrib-body-inner">
+              <p>When I started, there was an obvious inefficiency in the design process, which made it difficult to create designs with speed across the Boohoo Group brands. As there was also a poorly maintained code library too, there were often vast differences between what was designed, and what actually went live. Designers would create using vague guidelines, rarely use existing Components and Patterns, and create bespoke assets for every new project.</p>
+              <p>As part of my role, I established a white-label Design System which became the basis for how designs were handled across the 13 brands under the Boohoo Group. The efficiency gains at the Product Design level, and the resulting consistency between Design and Code were immediately apparent, and allowed us to release consistent updates at speed, which was a key driver for growth in the ever-changing world of fast fashion.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contrib-item">
+          <div class="contrib-title" onclick="toggleContrib(this)">
+            Ratings &amp; Reviews <span class="icon">+</span>
+          </div>
+          <div class="contrib-body">
+            <div class="contrib-body-inner">
+              <p>In the world of fast fashion, social proofing is a key driver for purchases. Alongside the addition of other forms of social proof such as remaining items tags, reviews on products can have a massive influence on whether customers buy an item.</p>
+              <p>Rating &amp; Reviews had been an addition which the board had been considering for a while, as they were unsure about the value it would add to the platform. Working alongside the Research Department, and refining potential approaches through prototypes, we eventually obtained approval to trial it on the Boohoo site as a proof of concept.</p>
+              <p>The feature received positive feedback, and customers valued the data we provided on average fit, quality, and text-based reviews which enabled them to make informed decisions on whether to purchase an item. The added touchpoint of email reminders to leave a review 7 days after purchase also had an unintended effect of increasing repeat traffic to the site.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contrib-item">
+          <div class="contrib-title" onclick="toggleContrib(this)">
+            Size Guide <span class="icon">+</span>
+          </div>
+          <div class="contrib-body">
+            <div class="contrib-body-inner">
+              <p>Alongside the addition of Ratings &amp; Reviews, another major project aimed at increasing the information available to customers to help them to make informed purchases was the addition of an updated Size Guide. The previous version featured no visuals and general data which customers found inaccurate, and resulted in high levels of returns as customers resorted to ordering multiple sizes of an item and returning the ones which didn't fit.</p>
+              <p>By working closely with the Merchandising Department, the updated Size Guide I created featured accurate data on item sizing, specific to multiple types of product. It also featured visuals and instructions on how customers should measure their proportions to help them purchase items which fit. This resulted in a reduction in returns and less occurrences of multiple item sizes of the same product being purchased as customers had more confidence that what they were buying would be the right fit.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer>Every time a designer detaches a component, a flower stops blooming.</footer>
+  </div>
+
+
+  <script>
+    const pages = ['home', 'bt-group', 'interactive-investor', 'boohoo-group'];
+    let transitioning = false;
+
+    function navigate(id) {
+      if (transitioning) return;
+      const currentPage = document.querySelector('.page.active');
+      const targetPage  = document.getElementById('page-' + id);
+      if (!targetPage || currentPage === targetPage) return;
+
+      transitioning = true;
+      currentPage.classList.add('page-exit');
+
+      setTimeout(() => {
+        currentPage.classList.remove('active', 'page-exit');
+        targetPage.classList.add('active', 'page-enter');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        window.location.hash = id === 'home' ? '' : id;
+        const titles = {
+          'home': 'Elliott',
+          'bt-group': 'Specialist Product Designer – BT Group | Elliott',
+          'interactive-investor': 'Design System Lead – Interactive Investor | Elliott',
+          'boohoo-group': 'Lead UI Designer – Boohoo Group | Elliott'
+        };
+        document.title = titles[id] || 'Elliott';
+        setTimeout(() => {
+          targetPage.classList.remove('page-enter');
+          transitioning = false;
+        }, 450);
+      }, 200);
+    }
+
+    function toggleContrib(el) {
+      const isOpen = el.classList.toggle('open');
+      el.querySelector('.icon').textContent = isOpen ? '−' : '+';
+      el.nextElementSibling.classList.toggle('open', isOpen);
+    }
+
+    function handleHash() {
+      const hash = window.location.hash.replace('#', '');
+      const id = pages.includes(hash) ? hash : 'home';
+      pages.forEach(p => document.getElementById('page-' + p).classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      window.location.hash = id === 'home' ? '' : id;
+      const titles = {
+        'home': 'Elliott',
+        'bt-group': 'Specialist Product Designer – BT Group | Elliott',
+        'interactive-investor': 'Design System Lead – Interactive Investor | Elliott',
+        'boohoo-group': 'Lead UI Designer – Boohoo Group | Elliott'
+      };
+      document.title = titles[id] || 'Elliott';
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (pages.includes(hash)) navigate(hash);
+    });
+
+    handleHash();
+  </script>
+</body>
+</html>
